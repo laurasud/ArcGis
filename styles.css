@@ -1,0 +1,52 @@
+html, body, .viewDiv {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  font-family: Roboto;
+}
+
+.info {
+  position:absolute;
+  right:0;
+  top: 0;
+  color:#000;
+  z-index:50;
+}
+
+.heading {
+  position: absolute;
+  height: 20px;
+  background: black;
+  opacity: 0.5;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+  margin: auto;
+  z-index: 50;
+  left: 0;
+  right: 0;
+  -webkit-animation: seconds 1.0s forwards;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-delay: 5s;
+  animation: seconds 1.0s forwards;
+  animation-iteration-count: 1;
+  animation-delay: 5s;
+}
+
+@-webkit-keyframes seconds {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes seconds {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0; 
+}
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>ArcGIS JavaScript užduotis</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/4.13/esri/themes/light/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://js.arcgis.com/4.13/"></script>
+    <script src="common.js"></script>
+    <script>
+      require([
+          "esri/Map",
+          "esri/views/MapView",
+          "esri/core/watchUtils",
+          "esri/tasks/Locator",
+          "esri/layers/GeoJSONLayer",
+        ], function(Map, MapView, watchUtils, Locator, GeoJSONLayer) {
+
+        const info = document.getElementById("info");
+        const heading = document.getElementById("heading");
+
+        const locatorTask = new Locator({
+          url:
+            "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer"
+        });
+
+        const renderer = {
+          type: "simple",
+          symbol: {
+            type: "simple-marker",
+            color: "red",
+            outline: {
+              color: "white"
+            }
+          }
+        };
+
+        const geojsonLayer = new GeoJSONLayer({
+          url: "https://opendata.arcgis.com/datasets/be32ac118bb94db98e2389826e80d3c5_0.geojson",
+          copyright: "Vilniaus miesto atviri duomenys",
+          renderer: renderer
+        });
+
+        let map = new Map({
+          basemap: "gray",
+          layers: [geojsonLayer]
+        });
+    
+        let view = new MapView({
+          container: "viewDiv",
+          map: map,
+          center: [25.268, 54.695], // longitude, latitude
+          zoom: 13
+        });
+
+        view
+          .when(function() {
+            let info = '<br><span style=" color: white;">Gyventojų perspėjimo sirenos Vilniaus mieste</span>';
+            displayText(heading, info);
+          })
+          .catch(errorHandler);
+
+        view.on("pointer-move", function(event) {
+          showCoordinates(view.toMap({ x: event.x, y: event.y }));
+        });
+
+        view.popup.autoOpenEnabled = false;
+
+        view.on("click", function(event) {
+          let lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
+          let lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
+
+          if (event.button === 0) {
+            view.popup.open({
+              title: "Vietos adresas",
+              location: event.mapPoint
+          });
+
+          let params = {
+            location: event.mapPoint
+          };
+
+          locatorTask
+            .locationToAddress(params)
+            .then(function(response) {
+              view.popup.content = response.address;
+            })
+            .catch(function(error) {
+              view.popup.content = "Adresas nerastas";
+            });
+          }
+
+        });
+      });
+      </script>
+  </head>
+  <body>
+    <div id="heading" class="heading"></div>
+    <div id="viewDiv" class="viewDiv">
+      <div id="info" class="info"></div>
+    </div>
+  </body>
+</html>
+ 
